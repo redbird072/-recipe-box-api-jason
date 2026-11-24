@@ -8,10 +8,19 @@ That is the point: you will add both, lesson by lesson, in Units 2 and 3.
 import sqlite3
 
 from flask import Flask, g, jsonify, request
+from werkzeug.security import generate_password_hash, check_password_hash
 
 DATABASE = "recipes.db"
 
 app = Flask(__name__)
+
+
+def hash_password(plain_password: str) -> str:
+    return generate_password_hash(plain_password, method="pbkdf2:sha256")
+
+
+def verify_password(stored_hash: str, candidate_password: str) -> bool:
+    return check_password_hash(stored_hash, candidate_password)
 
 
 def get_db():
