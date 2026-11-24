@@ -53,6 +53,11 @@ def hello():
     return jsonify({"message": "Recipe Box API", "recipes": "/recipes"})
 
 
+@app.post("/register")
+def register():
+    return {"message": "register placeholder"}, 200
+
+
 @app.get("/recipes")
 def list_recipes():
     rows = get_db().execute("SELECT * FROM recipes ORDER BY id").fetchall()
