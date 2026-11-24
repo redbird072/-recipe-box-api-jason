@@ -79,6 +79,11 @@ def register():
     return jsonify({"id": cursor.lastrowid, "username": username, "email": email}), 201
 
 
+@app.route("/login", methods=["POST"])
+def login():
+    return jsonify({"message": "login endpoint not implemented yet"}), 501
+
+
 @app.get("/recipes")
 def list_recipes():
     rows = get_db().execute("SELECT * FROM recipes ORDER BY id").fetchall()
