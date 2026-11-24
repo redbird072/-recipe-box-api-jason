@@ -63,7 +63,20 @@ def register():
     ):
         return jsonify({"error": "username, email, and password are required"}), 400
 
-    return jsonify({"message": "passed basic validation"}), 200
+    username = data["username"].strip()
+    email = data["email"].strip()
+    password_hash = hash_password(data["password"])
+    db = get_db()
+    with db:
+        cursor = db.execute(
+            "INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?) "
+            "ON CONFLICT DO NOTHING",
+            (username, email, password_hash),
+        )
+        if cursor.rowcount == 0:
+            return jsonify({"error": "username or email already exists"}), 409
+
+    return jsonify({"id": cursor.lastrowid, "username": username, "email": email}), 201
 
 
 @app.get("/recipes")
