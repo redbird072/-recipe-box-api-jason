@@ -55,7 +55,15 @@ def hello():
 
 @app.post("/register")
 def register():
-    return {"message": "register placeholder"}, 200
+    data = request.get_json(silent=True)
+    required_fields = ("username", "email", "password")
+    if not isinstance(data, dict) or not all(
+        isinstance(data.get(field), str) and data[field].strip()
+        for field in required_fields
+    ):
+        return jsonify({"error": "username, email, and password are required"}), 400
+
+    return jsonify({"message": "passed basic validation"}), 200
 
 
 @app.get("/recipes")
