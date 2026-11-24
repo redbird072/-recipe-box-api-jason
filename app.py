@@ -79,9 +79,24 @@ def register():
     return jsonify({"id": cursor.lastrowid, "username": username, "email": email}), 201
 
 
-@app.route("/login", methods=["POST"])
+@app.post("/login")
 def login():
-    return jsonify({"message": "login endpoint not implemented yet"}), 501
+    data = request.get_json(silent=True)
+    required_fields = ("username", "password")
+    if not isinstance(data, dict) or not all(
+        isinstance(data.get(field), str) and data[field].strip()
+        for field in required_fields
+    ):
+        return jsonify({"error": "username and password are required"}), 400
+
+    user = get_db().execute(
+        "SELECT id, username, password_hash FROM users WHERE username = ?",
+        (data["username"].strip(),),
+    ).fetchone()
+    if user is None or not verify_password(user["password_hash"], data["password"]):
+        return jsonify({"error": "Invalid credentials"}), 401
+
+    return jsonify({"id": user["id"], "username": user["username"]}), 200
 
 
 @app.get("/recipes")
